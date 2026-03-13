@@ -87,7 +87,12 @@ def main(argv: Optional[List[str]] = None) -> int:
         exact_version = _extract_exact_version(spec)
 
         # CVE-проверка через OSV.dev
-        findings.extend(cve_provider.find_cve_findings(dep_name, exact_version))
+        cve_findings = cve_provider.find_cve_findings(dep_name, exact_version)
+        findings.extend(cve_findings)
+
+        # Если по зависимости уже есть CVE-находки, сигнатурный анализ не выполняем
+        if cve_findings:
+            continue
 
         # Semgrep-скан зависимостей делаем только при точной версии
         if exact_version:
